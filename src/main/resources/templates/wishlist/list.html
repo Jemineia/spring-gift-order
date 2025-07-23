@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>찜한 상품 목록</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+  <h2 class="mb-4 text-center">❤️ 찜한 상품 목록</h2>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle text-center">
+      <thead class="table-danger">
+      <tr>
+        <th>ID</th>
+        <th>이미지</th>
+        <th>상품명</th>
+        <th>가격</th>
+        <th>수량</th>
+        <th>수량조절</th>
+        <th>상세보기</th>
+        <th>삭제</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${wishList}">
+        <td th:text="${item.product.id}"></td>
+        <td>
+          <img th:src="${item.product.imageUrl}" alt="상품 이미지" width="80" class="img-thumbnail"/>
+        </td>
+        <td th:text="${item.product.name}"></td>
+        <td th:text="${item.product.price} + '원'"></td>
+        <td th:text="${item.quantity}"></td>
+        <td>
+          <form th:action="@{|/wishlist/${item.product.id}/quantity|}" method="post" class="d-flex">
+            <input type="hidden" name="_method" value="put" />
+            <input type="number" name="quantity" th:value="${item.quantity}" min="1" class="form-control form-control-sm me-2" style="width: 80px;" />
+            <button type="submit" class="btn btn-sm btn-outline-success">변경</button>
+          </form>
+        </td>
+        <td>
+          <a th:href="@{|/api/wishlist/${item.product.id}|}" class="btn btn-sm btn-outline-primary">상세보기</a>
+        </td>
+        <td>
+          <form th:action="@{|/api/wishlist/${item.product.id}/delete|}" method="post">
+            <input type="hidden" name="_method" value="delete" />
+            <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+          </form>
+        </td>
+      </tr>
+      <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+      </tbody>
+    </table>
+    <nav th:if="${page.totalPages > 1}">
+      <ul class="pagination justify-content-center mt-4">
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+          <a class="page-link" th:href="@{|/api/wishlist?page=${page.number - 1}&size=${page.size}|}">이전</a>
+        </li>
+
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+            th:classappend="${i == page.number} ? 'active'">
+          <a class="page-link"
+             th:href="@{|/api/wishlist?page=${i}&size=${page.size}|}"
+             th:text="${i + 1}"></a>
+        </li>
+
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+          <a class="page-link" th:href="@{|/api/wishlist?page=${page.number + 1}&size=${page.size}|}">다음</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+</body>
+</html>

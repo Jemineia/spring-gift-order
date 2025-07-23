@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>재고 차감</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+  <h2 class="mb-4 text-center">📦 재고 차감</h2>
+
+  <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+  <div th:if="${success}" class="alert alert-success text-center" th:text="${success}"></div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form th:action="@{'/admin/options/' + ${option.id} + '/edit'}" method="post">
+        <div class="mb-3">
+          <label class="form-label fw-bold">옵션명</label>
+          <input type="text" th:value="${option.name}" class="form-control" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">현재 수량</label>
+          <input type="text" th:value="${option.quantity}" class="form-control" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label for="amount" class="form-label fw-bold">차감할 수량</label>
+          <input type="number" id="amount" name="amount" min="1" max="99999999" required
+                 class="form-control" placeholder="차감할 수량을 입력하세요">
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-danger">🚫 수량 차감</button>
+          <a th:href="@{/admin/products/{productId}/options(productId=${option.product.id})}"
+             class="btn btn-secondary ms-2">🔙 뒤로가기</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>
