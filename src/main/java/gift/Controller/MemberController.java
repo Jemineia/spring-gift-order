@@ -8,22 +8,16 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.client.RestTemplate;
-
 
 
 @Controller
@@ -66,12 +60,12 @@ public class MemberController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Void> login(@ModelAttribute MemberRequestDto req, HttpServletResponse response) throws IOException {
+  public ResponseEntity<Void> login(@ModelAttribute MemberRequestDto req,
+      HttpServletResponse response) throws IOException {
     HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
 
     // 카카오톡 인증토큰 발급
     final String rest_api_key = "@@@@@";
-    RestTemplate restTemplate = new RestTemplate();
 
     final String redirectUri = "http://localhost:8080";
     String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +

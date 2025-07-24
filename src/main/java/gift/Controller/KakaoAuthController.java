@@ -31,7 +31,7 @@ public class KakaoAuthController {
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
     var body = new LinkedMultiValueMap<String, String>();
     body.add("grant_type", "authorization_code");
-    body.add("client_id", "739d1d2c7f3d842f1aeff4b7a804c8a8");
+    body.add("client_id", "@@@@@");
     body.add("redirect_uri", "http://localhost:8080");
     body.add("code", code);
     var request = new RequestEntity<>(body, headers, HttpMethod.POST, URI.create(url));
