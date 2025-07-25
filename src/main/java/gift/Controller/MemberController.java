@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class MemberController {
 
   private final MemberService memberService;
   private final JwtUtil jwtUtil;
+
+  @Value("${kakao-rest-api-key}")
+  private String rest_api_key;
 
   public MemberController(MemberService memberService, JwtUtil jwtUtil) {
     this.memberService = memberService;
@@ -65,8 +69,6 @@ public class MemberController {
     HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
 
     // 카카오톡 인증토큰 발급
-    final String rest_api_key = "@@@@@";
-
     final String redirectUri = "http://localhost:8080";
     String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
         "?response_type=code" +
