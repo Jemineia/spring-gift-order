@@ -64,7 +64,7 @@ public class MemberController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Void> login(@ModelAttribute MemberRequestDto req,
+  public void login(@ModelAttribute MemberRequestDto req,
       HttpServletResponse response) throws IOException {
     HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
 
@@ -76,8 +76,6 @@ public class MemberController {
         "&redirect_uri=" + redirectUri +
         "&scope=talk_message";
     response.sendRedirect(kakaoAuthUrl);
-
-    return new ResponseEntity<>(headers, HttpStatus.OK);
   }
 
 }
