@@ -1,5 +1,6 @@
 package gift;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -72,18 +74,28 @@ public class MemberControllerTest {
     String email = "abc123@gmail.com";
     String password = "qwer1234!@";
 
-    // 회원가입
+    // 첫번째 회원가입
     mockMvc.perform(post("/api/members/register")
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .queryParam("email", email)
-        .queryParam("password", password));
+        .queryParam("password", password)
+    );
 
     // 로그인
-    mockMvc.perform(post("/api/members/login")
+    MvcResult result = mockMvc.perform(post("/api/members/login")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .queryParam("email", email)
             .queryParam("password", password))
-        .andExpect(status().isOk());
+        .andExpect(status().isFound())
+        .andReturn();
+
+    // 카카오 연동 인가코드 발급 - 실제 작동 아닌 MVC테스트 이므로 token발급은 나중에 테스트
+    String redirectUrl = result.getResponse().getRedirectedUrl();
+    assertTrue(redirectUrl.startsWith("https://kauth.kakao.com/oauth/authorize"));
+    assertTrue(redirectUrl.contains("client_id="));
+    assertTrue(redirectUrl.contains("redirect_uri=http://localhost:8080"));
+    assertTrue(redirectUrl.contains("scope=talk_message"));
+
   }
 
   @Test

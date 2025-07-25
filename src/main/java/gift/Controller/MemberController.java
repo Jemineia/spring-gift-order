@@ -3,8 +3,11 @@ package gift.Controller;
 import gift.dto.MemberRequestDto;
 import gift.jwt.JwtUtil;
 import gift.service.MemberService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +20,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+
 @Controller
 @RequestMapping("/api/members")
 public class MemberController {
 
   private final MemberService memberService;
   private final JwtUtil jwtUtil;
+
+  @Value("${kakao-rest-api-key}")
+  private String rest_api_key;
 
   public MemberController(MemberService memberService, JwtUtil jwtUtil) {
     this.memberService = memberService;
@@ -57,9 +64,18 @@ public class MemberController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Void> login(@ModelAttribute MemberRequestDto req) {
+  public void login(@ModelAttribute MemberRequestDto req,
+      HttpServletResponse response) throws IOException {
     HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
-    return new ResponseEntity<>(headers, HttpStatus.OK);
+
+    // 카카오톡 인증토큰 발급
+    final String redirectUri = "http://localhost:8080";
+    String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
+        "?response_type=code" +
+        "&client_id=" + rest_api_key +
+        "&redirect_uri=" + redirectUri +
+        "&scope=talk_message";
+    response.sendRedirect(kakaoAuthUrl);
   }
 
 }

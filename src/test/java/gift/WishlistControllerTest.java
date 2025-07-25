@@ -53,7 +53,7 @@ class WishlistControllerTest {
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .param("email", email)
             .param("password", password))
-        .andExpect(status().isOk())
+        .andExpect(status().isFound())
         .andReturn();
 
     String authHeader = loginResult.getResponse().getHeader(HttpHeaders.AUTHORIZATION);
