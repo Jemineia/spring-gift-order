@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +29,11 @@ public class KakaoAuthController {
   private String client_id;
 
   @GetMapping("/")
-  public ResponseEntity<String> kakaoCallback(@RequestParam("code") String code) {
+  public ResponseEntity<String> kakaoCallback(@RequestParam("code") String code,
+  @CookieValue(name = "Authorization", required = false) String jwtToken) {
 
     logger.info("발급받은 인가코드 : " + code);
+    logger.info("JWT 토큰 : " + jwtToken);
 
     String url = "https://kauth.kakao.com/oauth/token";
 
@@ -59,6 +62,7 @@ public class KakaoAuthController {
 
     // DTO를 기반으로 Header에 필드별로 세팅
     HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.add("Authorization", "Bearer " +jwtToken); // 기존 JWT
     responseHeaders.add("Access-Token", tokenDto.getAccessToken());
     responseHeaders.add("TokenType", tokenDto.getTokenType());
     responseHeaders.add("Refresh-Token", tokenDto.getRefreshToken());

@@ -66,9 +66,15 @@ public class MemberController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity login(@ModelAttribute MemberRequestDto req,
+  public void login(@ModelAttribute MemberRequestDto req,
       HttpServletResponse response) throws IOException {
-    HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
+    String jwt = memberService.login(req.getEmail(), req.getPassword());
+
+    Cookie jwtCookie = new Cookie("Authorization", jwt);
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setPath("/");
+    jwtCookie.setMaxAge(60 * 60);
+    response.addCookie(jwtCookie);
 
     // 카카오톡 인증토큰 발급
     final String redirectUri = "http://localhost:8080";
@@ -78,7 +84,6 @@ public class MemberController {
         "&redirect_uri=" + redirectUri +
         "&scope=talk_message";
     response.sendRedirect(kakaoAuthUrl);
-    return new ResponseEntity<>(headers, HttpStatus.OK);
   }
 }
 

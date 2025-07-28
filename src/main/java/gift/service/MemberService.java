@@ -35,16 +35,14 @@ public class MemberService {
     return jwtUtil.createToken(saved.getEmail());
   }
 
-  public HttpHeaders login(String email, String password) {
+  public String login(String email, String password) {
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new SecurityException("존재하지 않는 이메일입니다"));
     if (!passwordEncoder.matches(password, member.getPassword())) {
       throw new SecurityException("비밀번호가 틀렸습니다");
     }
     String token = jwtUtil.createToken(email);
-    HttpHeaders headers = new HttpHeaders();
-    headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-    return headers;
+    return token;
   }
 
 

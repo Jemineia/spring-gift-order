@@ -26,6 +26,6 @@ public class OrderController {
       @RequestBody orderRequestDto request,
       @LoginMember Member member) {
     orderResponseDto response = orderService.order(member.getEmail(), request);
-    return ResponseEntity.ok(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 }
