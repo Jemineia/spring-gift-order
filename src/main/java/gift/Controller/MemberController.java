@@ -28,8 +28,8 @@ public class MemberController {
   private final MemberService memberService;
   private final JwtUtil jwtUtil;
 
-  @Value("${kakao-rest-api-key}")
-  private String rest_api_key;
+  @Value("${kakaoRestApiKey}")
+  private String restApiKey;
 
   public MemberController(MemberService memberService, JwtUtil jwtUtil) {
     this.memberService = memberService;
@@ -64,7 +64,7 @@ public class MemberController {
   }
 
   @PostMapping("/login")
-  public void login(@ModelAttribute MemberRequestDto req,
+  public ResponseEntity<Object> login(@ModelAttribute MemberRequestDto req,
       HttpServletResponse response) throws IOException {
     HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
 
@@ -72,10 +72,11 @@ public class MemberController {
     final String redirectUri = "http://localhost:8080";
     String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
         "?response_type=code" +
-        "&client_id=" + rest_api_key +
+        "&client_id=" + restApiKey +
         "&redirect_uri=" + redirectUri +
         "&scope=talk_message";
     response.sendRedirect(kakaoAuthUrl);
+    return new ResponseEntity<>(headers, HttpStatus.FOUND);
   }
 
 }
