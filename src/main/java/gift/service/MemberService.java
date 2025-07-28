@@ -1,11 +1,15 @@
 package gift.service;
 
+import gift.Controller.KakaoAuthController;
 import gift.exception.DuplicateEmailException;
 import gift.jwt.JwtUtil;
 import gift.model.Member;
 import gift.repository.MemberRepository;
+import jakarta.servlet.http.Cookie;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

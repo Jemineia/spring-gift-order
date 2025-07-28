@@ -3,10 +3,13 @@ package gift.Controller;
 import gift.dto.MemberRequestDto;
 import gift.jwt.JwtUtil;
 import gift.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,14 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
 
   private final MemberService memberService;
-  private final JwtUtil jwtUtil;
+  private static final Logger logger = LoggerFactory.getLogger(KakaoAuthController.class);
 
   @Value("${kakaoRestApiKey}")
   private String restApiKey;
 
-  public MemberController(MemberService memberService, JwtUtil jwtUtil) {
+  public MemberController(MemberService memberService) {
     this.memberService = memberService;
-    this.jwtUtil = jwtUtil;
   }
 
   // 회원가입 기능
@@ -64,7 +66,7 @@ public class MemberController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Object> login(@ModelAttribute MemberRequestDto req,
+  public ResponseEntity login(@ModelAttribute MemberRequestDto req,
       HttpServletResponse response) throws IOException {
     HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
 
@@ -76,7 +78,7 @@ public class MemberController {
         "&redirect_uri=" + redirectUri +
         "&scope=talk_message";
     response.sendRedirect(kakaoAuthUrl);
-    return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    return new ResponseEntity<>(headers, HttpStatus.OK);
   }
-
 }
+
