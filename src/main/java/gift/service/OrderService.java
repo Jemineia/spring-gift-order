@@ -74,6 +74,8 @@ public class OrderService {
   private void sendCommerceMessage(String accessToken, Order order) {
     String url = "https://kapi.kakao.com/v2/api/talk/memo/default/send";
 
+   accessToken = accessToken.substring(6);
+
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
     headers.setBearerAuth(accessToken);

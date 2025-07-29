@@ -25,7 +25,7 @@ public class OrderController {
   @PostMapping
   public ResponseEntity<orderResponseDto> order(
       @RequestBody orderRequestDto request,
-      @RequestHeader("Access-Token") String kakaoAccessToken,
+      @RequestHeader("Kakao-AccessToken") String kakaoAccessToken,
       @LoginMember Member member) {
     orderResponseDto response = orderService.order(member.getEmail(), request, kakaoAccessToken);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);

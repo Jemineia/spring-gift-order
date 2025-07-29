@@ -63,7 +63,7 @@ public class KakaoAuthController {
     // DTO를 기반으로 Header에 필드별로 세팅
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.add("Authorization", "Bearer " +jwtToken); // 기존 JWT
-    responseHeaders.add("Access-Token", tokenDto.getAccessToken());
+    responseHeaders.add("Kakao-AccessToken", "Kakao " +tokenDto.getAccessToken()); // 카카오 Access Token
     responseHeaders.add("TokenType", tokenDto.getTokenType());
     responseHeaders.add("Refresh-Token", tokenDto.getRefreshToken());
     responseHeaders.add("Expires-In", String.valueOf(tokenDto.getExpiresIn()));
