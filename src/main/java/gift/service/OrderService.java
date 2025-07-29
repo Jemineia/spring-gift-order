@@ -65,7 +65,11 @@ public class OrderService {
     orderRepository.save(order);
 
     wishRepository.deleteByMemberAndProduct(member, option.getProduct());
-    sendCommerceMessage(kakaoAccessToken, order);
+
+    // 카카오 AccessToken이 있는경우, 메세지를 전송
+    if(kakaoAccessToken != null && !kakaoAccessToken.isBlank()) {
+      sendCommerceMessage(kakaoAccessToken, order);
+    }
 
     return new orderResponseDto(order.getId(), option.getId(), order.getQuantity(),
         order.getOrderDateTime(), order.getMessage());

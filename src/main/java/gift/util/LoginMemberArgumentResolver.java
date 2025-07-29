@@ -76,7 +76,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
         throw new UnsupportedAuthException("Kakao 인증에 실패했습니다");
       }
     }
-
     return member; // LoginMember로 주입될 객체
   }
 

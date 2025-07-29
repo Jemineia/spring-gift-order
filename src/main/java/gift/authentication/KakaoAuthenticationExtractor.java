@@ -36,7 +36,6 @@ public class KakaoAuthenticationExtractor implements AuthenticationExtractor {
     RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<String> response = restTemplate.exchange(request, String.class);
 
-    logger.info(response.getBody());
     return null;
   }
 }
