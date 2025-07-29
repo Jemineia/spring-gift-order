@@ -1,6 +1,6 @@
 package gift.dto;
 
-public class orderRequestDto {
+public class OrderRequestDto {
   private Long optionId;
   private int quantity;
   private String message;

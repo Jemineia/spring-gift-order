@@ -1,8 +1,8 @@
 package gift.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gift.dto.orderRequestDto;
-import gift.dto.orderResponseDto;
+import gift.dto.OrderRequestDto;
+import gift.dto.OrderResponseDto;
 import gift.model.Member;
 import gift.model.Order;
 import gift.model.ProductOption;
@@ -50,7 +50,7 @@ public class OrderService {
   }
 
   @Transactional
-  public orderResponseDto order(String email, orderRequestDto request, String kakaoAccessToken) {
+  public OrderResponseDto order(String email, OrderRequestDto request, String kakaoAccessToken) {
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new EntityNotFoundException("회원이 존재하지 않습니다"));
     ProductOption option = productOptionRepository.findById(request.getOptionId())
@@ -71,7 +71,7 @@ public class OrderService {
       sendCommerceMessage(kakaoAccessToken, order);
     }
 
-    return new orderResponseDto(order.getId(), option.getId(), order.getQuantity(),
+    return new OrderResponseDto(order.getId(), option.getId(), order.getQuantity(),
         order.getOrderDateTime(), order.getMessage());
   }
 

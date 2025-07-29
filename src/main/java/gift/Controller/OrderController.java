@@ -1,7 +1,7 @@
 package gift.Controller;
 
-import gift.dto.orderRequestDto;
-import gift.dto.orderResponseDto;
+import gift.dto.OrderRequestDto;
+import gift.dto.OrderResponseDto;
 import gift.model.Member;
 import gift.service.OrderService;
 import gift.util.LoginMember;
@@ -23,11 +23,11 @@ public class OrderController {
   }
 
   @PostMapping
-  public ResponseEntity<orderResponseDto> order(
-      @RequestBody orderRequestDto request,
+  public ResponseEntity<OrderResponseDto> order(
+      @RequestBody OrderRequestDto request,
       @RequestHeader(value = "Kakao-AccessToken", required = false) String kakaoAccessToken,
       @LoginMember Member member) {
-    orderResponseDto response = orderService.order(member.getEmail(), request, kakaoAccessToken);
+    OrderResponseDto response = orderService.order(member.getEmail(), request, kakaoAccessToken);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 }
