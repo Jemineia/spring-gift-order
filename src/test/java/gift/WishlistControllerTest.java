@@ -7,6 +7,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import gift.Controller.WishlistController;
+import gift.jwt.JwtUtil;
+import gift.jwt.TestJwtUtil;
+import gift.repository.WishlistRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -17,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,43 +31,28 @@ import org.springframework.test.web.servlet.MockMvc;
 
 class WishlistControllerTest {
 
-
   @Autowired
   private MockMvc mockMvc;
 
-  private final String password = "qwer1234!";
+  @Autowired
+  private JwtUtil jwtUtil;
+
   private String jwtToken;
+  @Autowired
+  private WishlistRepository wishlistRepository;
 
-  private boolean alreadyRegister = false;
-
-  // 찜하기 모든 기능은 회원가입->로그인 후 진행되므로
   @BeforeEach
-  void setup() throws Exception {
-    // 회원가입 - 중복 이메일 생성 방지(MemberControllerTest에서 이미 검증)
-    String email = "test" + System.currentTimeMillis() + "@example.com";
-    mockMvc.perform(post("/api/members/register")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .param("email", email)
-            .param("password", password))
-        .andExpect(status().isCreated());
-
-    // 로그인
-    var loginResult = mockMvc.perform(post("/api/members/login")
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .param("email", email)
-            .param("password", password))
-        .andExpect(status().isFound())
-        .andReturn();
-
-    String authHeader = loginResult.getResponse().getHeader(HttpHeaders.AUTHORIZATION);
-    assertThat(authHeader).startsWith("Bearer ");
-    jwtToken = authHeader;
+  void setUp() {
+    // 테스트 토큰 발급
+    jwtToken = "Bearer " + jwtUtil.createToken("test@gmail.com");
+    wishlistRepository.deleteAll();
   }
 
   @Test
   @Order(1)
   @DisplayName("[1] 찜하기 기능 정상 동작 테스트")
   void testAddToWishlist() throws Exception {
+
     mockMvc.perform(post("/api/products/1/wishlist")
             .header(HttpHeaders.AUTHORIZATION, jwtToken))
         .andExpect(status().is3xxRedirection())
@@ -154,4 +142,5 @@ class WishlistControllerTest {
             .header(HttpHeaders.AUTHORIZATION, jwtToken))
         .andExpect(status().isNotFound()); // 찜목록에 존재하지 않는 경우 NotFoundDeleteWishlistException
   }
+
 }

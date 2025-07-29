@@ -24,3 +24,6 @@ values (2, '500g 중간포장 [Best]', 300);
 
 insert into product_option (product_id, option, quantity)
 values (2, '1kg 대용량 (선물용)', 150);
+
+insert into member (email, password)
+values ('test@gmail.com', 'qwer1234!@');
