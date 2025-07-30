@@ -21,18 +21,18 @@ public class KakaoTokenResponseDto {
   @JsonProperty("refresh_token_expires_in")
   private int refreshTokenExpiresIn;
 
-  public String getAccess_token() { return accessToken; }
+  public String getAccessToken() { return accessToken; }
 
-  public String getToken_type() {
+  public String getTokenType() {
     return tokenType;
   }
 
-  public String getRefresh_token() {
+  public String getRefreshToken() {
     return refreshToken;
   }
 
 
-  public int getExpires_in() {
+  public int getExpiresIn() {
     return expiresIn;
   }
 
@@ -41,7 +41,7 @@ public class KakaoTokenResponseDto {
     return scope;
   }
 
-  public int getRefresh_token_expires_in() {
+  public int getRefreshTokenExpiresIn() {
     return refreshTokenExpiresIn;
   }
 

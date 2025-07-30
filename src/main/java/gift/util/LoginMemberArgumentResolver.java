@@ -1,9 +1,11 @@
 package gift.util;
 
-import gift.jwt.JwtUtil;
+import gift.authentication.AuthenticationExtractor;
+import gift.authentication.JwtAuthenticationExtractor;
+import gift.authentication.KakaoAuthenticationExtractor;
+import gift.exception.UnsupportedAuthException;
 import gift.model.Member;
-import gift.repository.MemberRepository;
-import jakarta.servlet.ServletException;
+import java.util.List;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -14,12 +16,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
-  private final JwtUtil jwtUtil;
-  private final MemberRepository memberRepository;
+  private final List<AuthenticationExtractor> extractors;
 
-  public LoginMemberArgumentResolver(JwtUtil jwtUtil, MemberRepository memberRepository) {
-    this.jwtUtil = jwtUtil;
-    this.memberRepository = memberRepository;
+  public LoginMemberArgumentResolver(List<AuthenticationExtractor> extractors) {
+    this.extractors = extractors;
   }
 
 
@@ -34,16 +34,49 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
       ModelAndViewContainer mavContainer,
       NativeWebRequest webRequest,
       WebDataBinderFactory binderFactory) throws Exception {
-    String authHeader = webRequest.getHeader("Authorization");
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-      throw new ServletException("Authorization 헤더가 없습니다");
+
+    String jwtHeader = webRequest.getHeader("Authorization"); // 필수
+    String kakaoHeader = webRequest.getHeader("Kakao-AccessToken"); // 선택
+    // 나중에 보조 토큰(구글,네이버 확장 가능)
+
+    Member member = null;
+
+    // ✅ 1. JWT는 반드시 있어야함 -> 없으면 인증오류
+    if (jwtHeader == null || jwtHeader.isBlank()) {
+      throw new UnsupportedAuthException("JWT 토큰이 누락되었습니다");
     }
-    String token = authHeader.substring(7);
-    if (!jwtUtil.isValidToken(token)) {
-      throw new ServletException("유효하지 않은 토큰입니다");
+
+    boolean jwtValidated = false;
+
+    for (AuthenticationExtractor extractor : extractors) {
+      if (extractor instanceof JwtAuthenticationExtractor && extractor.supports(jwtHeader)) {
+        member = extractor.extract(jwtHeader);
+        jwtValidated = true;
+        break;
+      }
     }
-    String email = jwtUtil.getEmailFromToken(token);
-    return memberRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityException("사용자를 찾을 수 없습니다"));
+
+    if (!jwtValidated) {
+      throw new UnsupportedAuthException("JWT 인증에 실패했습니다");
+    }
+
+    System.out.println(kakaoHeader);
+    // ✅ 2. 보조 토큰이 있는 경우 유효성 검사 추가 (예: Kakao)
+    if (kakaoHeader != null && !kakaoHeader.isBlank()) {
+      boolean kakaoValidated = false;
+      for (AuthenticationExtractor extractor : extractors) {
+        if (extractor instanceof KakaoAuthenticationExtractor && extractor.supports(kakaoHeader)) {
+          extractor.extract(kakaoHeader); // 실패하면 예외 발생
+          kakaoValidated = true;
+          break;
+        }
+      }
+
+      if (!kakaoValidated) {
+        throw new UnsupportedAuthException("Kakao 인증에 실패했습니다");
+      }
+    }
+    return member; // LoginMember로 주입될 객체
   }
+
 }

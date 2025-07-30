@@ -3,10 +3,13 @@ package gift.Controller;
 import gift.dto.MemberRequestDto;
 import gift.jwt.JwtUtil;
 import gift.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,14 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
 
   private final MemberService memberService;
-  private final JwtUtil jwtUtil;
+  private static final Logger logger = LoggerFactory.getLogger(KakaoAuthController.class);
 
-  @Value("${kakao-rest-api-key}")
-  private String rest_api_key;
+  @Value("${kakaoRestApiKey}")
+  private String restApiKey;
 
-  public MemberController(MemberService memberService, JwtUtil jwtUtil) {
+  public MemberController(MemberService memberService) {
     this.memberService = memberService;
-    this.jwtUtil = jwtUtil;
   }
 
   // 회원가입 기능
@@ -66,16 +68,22 @@ public class MemberController {
   @PostMapping("/login")
   public void login(@ModelAttribute MemberRequestDto req,
       HttpServletResponse response) throws IOException {
-    HttpHeaders headers = memberService.login(req.getEmail(), req.getPassword());
+    String jwt = memberService.login(req.getEmail(), req.getPassword());
+
+    Cookie jwtCookie = new Cookie("Authorization", jwt);
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setPath("/");
+    jwtCookie.setMaxAge(60 * 60);
+    response.addCookie(jwtCookie);
 
     // 카카오톡 인증토큰 발급
     final String redirectUri = "http://localhost:8080";
     String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize" +
         "?response_type=code" +
-        "&client_id=" + rest_api_key +
+        "&client_id=" + restApiKey +
         "&redirect_uri=" + redirectUri +
         "&scope=talk_message";
     response.sendRedirect(kakaoAuthUrl);
   }
-
 }
+

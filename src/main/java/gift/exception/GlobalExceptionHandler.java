@@ -10,6 +10,9 @@ import gift.util.LoginMember;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -201,6 +204,16 @@ public class GlobalExceptionHandler {
     model.addAttribute("error", ex.getMessage());  // 템플릿에 맞게 "error"로 전달
 
     return "admin/options/edit";
+  }
+
+  @ExceptionHandler(UnsupportedAuthException.class)
+  public ResponseEntity<Map<String, Object>> handleUnsupportedAuth(UnsupportedAuthException ex) {
+    Map<String, Object> response = new LinkedHashMap<>();
+    response.put("error", "Bad Request");
+    response.put("message", ex.getMessage());
+    response.put("timestamp", Instant.now());
+    response.put("status", HttpStatus.BAD_REQUEST.value());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 }
 

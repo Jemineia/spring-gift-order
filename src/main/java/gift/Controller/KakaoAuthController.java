@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +29,11 @@ public class KakaoAuthController {
   private String client_id;
 
   @GetMapping("/")
-  public ResponseEntity<String> kakaoCallback(@RequestParam("code") String code) {
+  public ResponseEntity<String> kakaoCallback(@RequestParam("code") String code,
+  @CookieValue(name = "Authorization", required = false) String jwtToken) {
 
     logger.info("발급받은 인가코드 : " + code);
+    logger.info("JWT 토큰 : " + jwtToken);
 
     String url = "https://kauth.kakao.com/oauth/token";
 
@@ -53,19 +56,20 @@ public class KakaoAuthController {
       tokenDto = objectMapper.readValue(response.getBody(),
           KakaoTokenResponseDto.class);
     } catch (JsonProcessingException e) {
-      System.out.println("JSON필드와 제대로 매칭되지 않습니다");
+      logger.info("JSON필드와 제대로 매칭되지 않습니다");
       throw new RuntimeException(e);
     }
 
     // DTO를 기반으로 Header에 필드별로 세팅
     HttpHeaders responseHeaders = new HttpHeaders();
-    responseHeaders.add("Access-Token", tokenDto.getAccess_token());
-    responseHeaders.add("TokenType", tokenDto.getToken_type());
-    responseHeaders.add("Refresh-Token", tokenDto.getRefresh_token());
-    responseHeaders.add("Expires-In", String.valueOf(tokenDto.getExpires_in()));
+    responseHeaders.add("Authorization", "Bearer " +jwtToken); // 기존 JWT
+    responseHeaders.add("Kakao-AccessToken", "Kakao " +tokenDto.getAccessToken()); // 카카오 Access Token
+    responseHeaders.add("TokenType", tokenDto.getTokenType());
+    responseHeaders.add("Refresh-Token", tokenDto.getRefreshToken());
+    responseHeaders.add("Expires-In", String.valueOf(tokenDto.getExpiresIn()));
     responseHeaders.add("scope", tokenDto.getScope());
     responseHeaders.add("refresh_token_expires_in",
-        String.valueOf(tokenDto.getRefresh_token_expires_in()));
+        String.valueOf(tokenDto.getRefreshTokenExpiresIn()));
 
     return new ResponseEntity<>("정상적으로 토큰이 발급되었습니다!", responseHeaders, HttpStatus.CREATED);
   }
