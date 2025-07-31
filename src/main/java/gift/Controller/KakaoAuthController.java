@@ -33,6 +33,9 @@ public class KakaoAuthController {
   @Value("${kakao-rest-api-key}")
   private String client_id;
 
+  @Value("${ec2PublicIp}")
+  private String ec2PublicIp;
+
   public KakaoAuthController(MemberRepository memberRepository, JwtUtil jwtUtil) {
     this.memberRepository = memberRepository;
     this.jwtUtil = jwtUtil;
@@ -53,7 +56,7 @@ public class KakaoAuthController {
     var body = new LinkedMultiValueMap<String, String>();
     body.add("grant_type", "authorization_code");
     body.add("client_id", client_id);
-    body.add("redirect_uri", "http://localhost:8080");
+    body.add("redirect_uri", "http://" + ec2PublicIp + ":8080");
     body.add("code", code);
     var request = new RequestEntity<>(body, headers, HttpMethod.POST, URI.create(url));
 

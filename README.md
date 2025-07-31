@@ -34,4 +34,4 @@
 - [x] Step2 Review 바탕으로 코드 수정
   - [x] loop 대신 명시적으로 KakaoAuthenticationExtractor 사용
   - [x] KakaoAuthenticationExtractor에서 객체 만들어서 return
-- [ ] 배포 스크립트 작성
+- [x] 배포 스크립트 작성
